@@ -8,23 +8,33 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Setup Python Env') {
             steps {
-                sh 'pip3 install -r requirements.txt'
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'pytest test_app.py'
+                sh '''
+                    . venv/bin/activate
+                    pytest test_app.py
+                '''
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'mkdir -p /tmp/deploy'
-                sh 'cp app.py /tmp/deploy/'
-                echo "App deployed to /tmp/deploy"
+                sh '''
+                    mkdir -p /tmp/deploy
+                    cp app.py /tmp/deploy/
+                    echo "App deployed to /tmp/deploy"
+                '''
             }
         }
     }
@@ -41,3 +51,4 @@ pipeline {
         }
     }
 }
+
